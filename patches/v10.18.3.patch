@@ -1,0 +1,98 @@
+--- a/app/build.gradle
++++ b/app/build.gradle
+@@ -10,8 +10,8 @@
+         applicationId "com.maeummon.app.pastel5.v5400"
+         minSdk 26
+         targetSdk 34
+-        versionCode 101802
+-        versionName "10.18.2"
++        versionCode 101803
++        versionName "10.18.3"
+     }
+ 
+     buildTypes {
+--- a/app/src/main/java/com/maeummon/app/CounselingProgramAnalyzer.java
++++ b/app/src/main/java/com/maeummon/app/CounselingProgramAnalyzer.java
+@@ -79,7 +79,7 @@
+                 "(D) 이미 충분히 익혔거나 DONE에 가까운지에 따른 미해결도를 함께 비교한다. 최근 한두 턴이 길거나 생생하다는 이유만으로 왕관을 주지 않는다. " +
+                 "반대로 과거에 중요했어도 최근 약화/해결된 축은 내려라. 가장 높은 priority가 왕관이며 반드시 한 개만 뚜렷한 1순위가 되게 한다. " +
+                 "crown_reason에는 왜 이 PT가 다른 기존 PT보다 상위인지 전체 반복성/최근 활성/상위 유지기제/미해결 중 핵심 근거를 1~2문장 생활언어로 적는다. " +
+-                "muscle_name과 merge_into는 입력에 있는 문자열을 글자 하나 바꾸지 말고 그대로 반환한다. merge_into는 병합하지 않을 PT면 빈 문자열이다. 같은 장면이더라도 경계 말하기/요청하기/신체상태 전달처럼 학습목표가 다르면 병합하지 않는다. 반드시 JSON 하나만 출력한다. 마크다운 금지. " +
++                "muscle_name과 merge_into는 입력에 있는 문자열을 글자 하나 바꾸지 말고 그대로 반환한다. merge_into는 병합하지 않을 PT면 빈 문자열이다. 같은 장면이더라도 경계 말하기/요청하기/신체상태 전달처럼 학습목표가 다르면 병합하지 않는다. 관계 신호 해석과 그 신호가 곧 자기 가치 판정으로 번지는 두 PT가 사실/해석 분리→가치판단 분리→판정 보류라는 한 연속 학습축이면 병합한다. 범용 상태전달 PT와 그 의료 하위버전(약/기분 전달)이 동시에 있으면, 원문에 의료 외 상태·욕구·경계 전달 근거가 있는 한 좁은 의료 PT를 범용 PT로 병합한다. 반드시 JSON 하나만 출력한다. 마크다운 금지. " +
+                 "스키마: {\"crown_muscle\":string,\"crown_reason\":string,\"programs\":[{\"muscle_name\":string,\"priority\":1-100,\"merge_into\":string}]}";
+         String user = "[현재 저장된 PT]\n" + existing + "\n\n[전체 상담 원문]\n" + clip(clean, 45000);
+         String text = callResponses(apiKey, chosenModel, system, user, 1600);
+@@ -1024,6 +1024,8 @@
+                 "PT 이름이 달라도 다음을 비교한다: (1) 같은 유지기제를 끊는가, (2) 사용자가 배우려는 핵심 학습목표가 같은가, (3) 한 PT의 행동이 다른 PT의 자연스러운 다음 단계/하위 단계인가. " +
+                 "이 셋 중 (1)+(2)가 같고 행동들이 한 축의 연속 단계라면 같은 PT로 병합한다. 예를 들어 '무반응과 해석을 분리하기'와 '신호를 바로 판결하지 않기'가 모두 애매한 신호를 곧바로 거절/배척으로 확정하지 않는 학습을 목표로 한다면 별도 카드 두 장이 아니라 하나의 PT 안 서로 다른 단계가 더 적절하다. " +
+                 "반대로 같은 관계 장면이라도 경계 말하기, 회복하기, 확인행동 늦추기처럼 바꾸는 레버나 학습목표가 실제로 다르면 별도 PT로 유지한다. 특히 '사실/해석 분리'와 '패닉에서 되돌릴 수 없는 결정을 보류'는 같은 불안 흐름에 있어도 하나는 해석 기술, 하나는 행동 제동 기술이므로 사용자 직접근거가 있으면 병합하지 않는다. " +
++                "관계 신호 해석 PT와 '관계 변화가 곧 내 가치 하락이라는 결론으로 번지는 PT'가 같은 사건 연쇄에서 이어지고, 실제 연습도 사실/해석 분리 → 자기 가치 판단 분리 → 판정 보류처럼 한 축의 자연스러운 심화 단계라면 두 카드로 쪼개지 말고 하나의 상위 PT로 병합한다. 다만 한쪽이 실제 경계 말하기·요청하기·접촉량 조절처럼 별도 행동 레버를 요구하면 분리한다. " +
++                "또 기존 PT에 '내 상태를 정확히 전달하는 힘'처럼 범용 상태전달 축이 있는데 새 분석이 '약과 기분 변화를 정확히 전하는 힘'처럼 의료 상황만 좁혀 이름을 바꾼 후보를 만들었다면, 원문에 관계/직장 상태·욕구·경계 전달 근거가 함께 있는 한 새 카드로 만들지 말고 기존 범용 PT에 의료 장면을 근거/1단계 예시로 흡수한다. " +
+                 "중복을 병합해 자리가 비었을 때만 1차 후보/상담 근거에서 아직 PT가 되지 않은 '다른 유지기제 또는 다른 행동 레버'를 보완한다. 근거가 없으면 억지로 숫자를 채우지 않는다. " +
+                 "왕관 priority는 유지한다는 뜻이 아니라 최종 PT들을 다시 비교해 '전체에서 중요하고 최근에도 살아 있으며 상위 유지기제를 끊는 미해결 축' 하나가 가장 높도록 한다. " +
+                 "사용자 정정/부정 가설은 제외하고, DIRECT 근거는 보존한다. muscle_name은 짧은 생활언어의 '~하는 힘'으로 쓰며, 서로 다른 PT의 이름만 읽어도 무엇이 다른지 보여야 한다. " +
+--- a/app/src/main/java/com/maeummon/app/MindPtActivity.java
++++ b/app/src/main/java/com/maeummon/app/MindPtActivity.java
+@@ -143,6 +143,12 @@
+ 
+     private void renderProgramChoices(java.util.List<MindTrainingStore.ProgramSummary> programs) {
+         if (programChoicesSection == null || programChoicesContainer == null) return;
++        // v10.18.3: stop animations before removing old cards so a previous crown card cannot
++        // keep drawing over the newly selected card as a hardware-animation ghost.
++        for (int i = 0; i < programChoicesContainer.getChildCount(); i++) {
++            View old = programChoicesContainer.getChildAt(i);
++            if (old != null) { old.clearAnimation(); old.animate().cancel(); }
++        }
+         programChoicesContainer.removeAllViews();
+         if (programs == null || programs.isEmpty()) {
+             programChoicesSection.setVisibility(View.GONE);
+@@ -211,15 +217,9 @@
+         glow.setDuration(900L);
+         glow.setRepeatMode(android.view.animation.Animation.REVERSE);
+         glow.setRepeatCount(android.view.animation.Animation.INFINITE);
+-        android.view.animation.ScaleAnimation pulse = new android.view.animation.ScaleAnimation(
+-                1.0f, 1.012f, 1.0f, 1.012f,
+-                android.view.animation.Animation.RELATIVE_TO_SELF, 0.5f,
+-                android.view.animation.Animation.RELATIVE_TO_SELF, 0.5f);
+-        pulse.setDuration(900L);
+-        pulse.setRepeatMode(android.view.animation.Animation.REVERSE);
+-        pulse.setRepeatCount(android.view.animation.Animation.INFINITE);
++        // Do not scale the whole card: even a tiny ScaleAnimation visually overlaps the next card
++        // and can leave a stale animated frame after selection changes. Crown sparkle is alpha-only.
+         set.addAnimation(glow);
+-        set.addAnimation(pulse);
+         set.setInterpolator(new android.view.animation.AccelerateDecelerateInterpolator());
+         crownCard.startAnimation(set);
+     }
+--- a/app/src/main/java/com/maeummon/app/SharedCounselingLinkActivity.java
++++ b/app/src/main/java/com/maeummon/app/SharedCounselingLinkActivity.java
+@@ -28,7 +28,7 @@
+ /** Imports a ChatGPT shared conversation snapshot and converts it into Mind PT programs. */
+ public class SharedCounselingLinkActivity extends Activity {
+     private static final String COLLECTOR_VERSION = "v3";
+-    private static final int CROWN_POLICY_VERSION = 9;
++    private static final int CROWN_POLICY_VERSION = 10;
+     private static final String CROWN_POLICY_PREF_PREFIX = "crown_policy_version_counseling_";
+     private EditText linkInput;
+     private TextView statusText, verificationText, previewText, programsText, importButton;
+@@ -692,10 +692,18 @@
+                     prepWarning = safeMessage(prepError);
+                 }
+ 
++                // v10.18.3: policy audit must not only ASK the model about semantic duplicates;
++                // it must actually apply those merges to stored PTs before choosing the crown.
+                 String crownContext = store.existingProgramContext(counselingId);
+-                CounselingProgramAnalyzer.CrownOnlyResult crownResult = CounselingProgramAnalyzer.rerankExistingCrownOnly(apiKey, model, crownTranscript, crownContext);
++                CounselingProgramAnalyzer.CrownRerankResult semantic =
++                        CounselingProgramAnalyzer.rerankExistingPrograms(apiKey, model, crownTranscript, crownContext);
++                int semanticChanged = store.applyProgramPrioritiesAndSemanticMerges(
++                        counselingId, semantic.priorities, semantic.mergeInto);
++                crownContext = store.existingProgramContext(counselingId);
++                CounselingProgramAnalyzer.CrownOnlyResult crownResult =
++                        CounselingProgramAnalyzer.rerankExistingCrownOnly(apiKey, model, crownTranscript, crownContext);
+                 int crownChanged = store.setCrownProgramById(counselingId, crownResult.crownProgramId);
+-                final int changed = prepChanged + crownChanged;
++                final int changed = prepChanged + semanticChanged + crownChanged;
+                 final String warning = prepWarning;
+                 store.bindAllSharedThreadsCounseling(counselingId);
+                 prefs.edit().putInt(CROWN_POLICY_PREF_PREFIX + counselingId, CROWN_POLICY_VERSION).apply();
