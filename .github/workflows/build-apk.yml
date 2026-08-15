@@ -95,13 +95,13 @@ jobs:
             exit 1
           fi
           mkdir -p out
-          cp "$APK_FILE" out/MaeumMon-v10.18.4.apk
-          ls -lh out/MaeumMon-v10.18.4.apk
+          cp "$APK_FILE" out/MaeumMon-v10.18.5.apk
+          ls -lh out/MaeumMon-v10.18.5.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: MaeumMon-v10.18.4-apk
-          path: out/MaeumMon-v10.18.4.apk
+          name: MaeumMon-v10.18.5-apk
+          path: out/MaeumMon-v10.18.5.apk
           if-no-files-found: error
           retention-days: 30
