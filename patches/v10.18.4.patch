@@ -3,13 +3,13 @@
 @@ -327,7 +327,7 @@
                  "rationale은 2~4문장까지 허용한다. (1) 상담에서 어떤 반복 패턴이 확인됐는지, (2) 이 단계가 그 유지기제의 어느 고리를 끊는지, (3) 앞/뒤 단계와 무엇이 다른지를 생활언어로 설명한다. 사용자가 읽고 '아 그래서 이 훈련을 하는구나'라고 이해할 수 있어야 한다. " +
                  "단계끼리 같은 행동을 숫자만 바꿔 반복하지 않는다. 각 단계 rationale 마지막에는 \"이전 단계보다 더 어려운 점\"을 생활언어로 한 문장 명시한다. 2단계는 1단계보다 적용 장면 또는 불확실성이 넓어야 하고, 3단계는 2단계보다 외부 확인 없이 자기 선택을 유지하는 요소가 반드시 하나 이상 있어야 한다. 실패하거나 기회가 없었던 결과도 다음 단계 설계의 정보로 쓸 수 있게, 지나치게 완벽주의적인 성공기준은 피한다. " +
+                 "특히 행동 제동 PT라면 원문에 근거가 있을 때 1단계는 짧은 가역적 멈춤(예: 30분), 2단계는 되돌리기 어려운 관계 결정의 24시간 보류, 3단계는 쉬고 난 뒤 사실/욕구/경계를 다시 확인하고 선택하는 흐름처럼 점진적으로 설계한다. 단, 원문에 없는 행동을 임의로 끼워 넣지 않는다. " +
 -                "사실/해석 분리 PT라면 사실 한 줄/해석 한 줄 → 대안설명 추가 → 높은 불안 상황에서도 판결 보류처럼 점진화한다. 경계 PT라면 작은 거절/짧은 거리두기 → 설명 최소화 → 관계를 끊지 않고 경계 유지처럼 구체화한다. 상태전달 PT라면 몸/감정/필요를 짧게 전달 → 부탁 한 가지 추가 → 갈등 상황에서도 직접 전달처럼 구체화한다. " +
 +                "사실/해석 분리 PT라면 1단계에서 실제 한 장면을 골라 ① 확인 가능한 사실 ② 내가 붙인 해석 ③ 그 해석 때문에 생긴 자기 가치 판단을 각각 한 줄로 쓴다. 2단계는 기록 뒤 '원인은 아직 모름. 지금은 관계 판정을 10분 미룬다'라고 적고 10분 동안 재확인·추적·재분석을 멈춘 뒤 원래 하던 행동으로 돌아간다. 3단계는 다음 날 기록 하나를 골라 첫 해석과 맞지 않는 사실 하나와 가능한 다른 설명 하나를 적고 '확정 불가/한 번 더 관찰/필요하면 차분히 확인' 중 하나로 끝낸다. 이 구체도를 기본 기준으로 삼는다. 경계 PT라면 작은 거절/짧은 거리두기 → 설명 최소화 → 관계를 끊지 않고 경계 유지처럼 구체화한다. 접촉량/에너지 조절 PT라면 접촉 전 피로·불안 점수 확인 → 편한 사람 1명과 정해진 시간의 저강도 접촉 → 접촉 후 긴장도·회복시간을 기록해 다음 접촉 강도를 조정하는 식으로 구체화한다. 상태전달 PT라면 몸/감정/필요를 짧게 전달 → 부탁 한 가지 추가 → 갈등 상황에서도 직접 전달처럼 구체화한다. " +
-                 "기회 없는 날에도 수행 가능한 대체 행동을 stage마다 자연스럽게 포함한다. 예를 들어 실제 상대와 상황이 없으면 '오늘 있었던 장면 1개를 골라 문장 리허설하기'처럼 같은 기술을 혼자 연습하게 한다. " +
-                 "범용 상태전달 PT 검증: 입력 PT가 상태·감정·욕구·경계 전달을 다루고 원문에 의료/관계/직장 중 둘 이상의 맥락 근거가 있다면, 3단계 중 최소 2단계는 서로 다른 맥락 또는 상대에게 적용되어야 한다. 세 단계 중 2개 이상을 약 이름·용량·수면기록·의료기관 전달만으로 채우지 않는다. 1단계는 '내가 지금 어떤 상태이고 무엇이 필요한지'를 스스로 문장화, 2단계는 필요한 상대에게 구체적 사실+욕구/요청을 전달, 3단계는 상대 반응이 기대와 달라도 내 상태와 경계를 유지하면서 필요한 조정을 선택하는 흐름을 기본 골격으로 삼는다. 다만 원문에 의료 외 맥락 근거가 없으면 이 골격을 강제하지 않는다. " +
-                 "각 프로그램마다 steps를 정확히 3개 반환하되, 현재 PT가 이미 충분히 숙련되어 MASTERY_CANDIDATE면 2~3단계가 유지·일반화·재발예방이 되도록 한다. " +
+                 "과거에 이미 DONE/ACTIVE/PENDING이 있을 수 있으므로 결과는 단계 내용만 개선하는 용도다. 반드시 JSON 하나만 출력한다. 마크다운 금지. " +
+                 "스키마: {\"title\":string,\"current_concern\":string,\"formulation\":string,\"priority_direction\":string,\"caution\":string," +
+                 "\"programs\":[{\"name\":string,\"mechanism\":string,\"muscle_name\":string,\"priority\":1-100,\"reason\":string,\"source\":\"DIRECT|EXPANSION\"," +
 @@ -1029,6 +1029,7 @@
-                 "또 기존 PT에 '내 상태를 정확히 전달하는 힘'처럼 범용 상태전달 축이 있는데 새 분석이 '약과 기분 변화를 정확히 전하는 힘'처럼 의료 상황만 좁혀 이름을 바꾼 후보를 만들었다면, 원문에 관계/직장 상태·욕구·경계 전달 근거가 함께 있는 한 새 카드로 만들지 말고 기존 범용 PT에 의료 장면을 근거/1단계 예시로 흡수한다. " +
                  "중복을 병합해 자리가 비었을 때만 1차 후보/상담 근거에서 아직 PT가 되지 않은 '다른 유지기제 또는 다른 행동 레버'를 보완한다. 근거가 없으면 억지로 숫자를 채우지 않는다. " +
                  "왕관 priority는 유지한다는 뜻이 아니라 최종 PT들을 다시 비교해 '전체에서 중요하고 최근에도 살아 있으며 상위 유지기제를 끊는 미해결 축' 하나가 가장 높도록 한다. " +
                  "사용자 정정/부정 가설은 제외하고, DIRECT 근거는 보존한다. muscle_name은 짧은 생활언어의 '~하는 힘'으로 쓰며, 서로 다른 PT의 이름만 읽어도 무엇이 다른지 보여야 한다. " +
@@ -17,16 +17,18 @@
                  "최종 2~4개를 반환한다. 반드시 기존 최종 JSON 스키마 하나만 출력하고 마크다운은 금지한다.";
          String user = "[상담 근거]\n" + clip(evidenceText == null ? "" : evidenceText, 30000) +
                  "\n\n[1차 후보]\n" + (discovery == null ? "{}" : discovery.toString()) +
---- v10183_work/app/src/main/java/com/maeummon/app/SharedCounselingLinkActivity.java	2026-08-15 09:43:08.000000000 +0000
-+++ v10184_work/app/src/main/java/com/maeummon/app/SharedCounselingLinkActivity.java	2026-08-15 10:05:17.000000000 +0000
+--- v10183_work/app/src/main/java/com/maeummon/app/SharedCounselingLinkActivity.java	2026-08-15 09:41:34.946049051 +0000
++++ v10184_work/app/src/main/java/com/maeummon/app/SharedCounselingLinkActivity.java	2026-08-15 10:04:58.619837183 +0000
 @@ -28,7 +28,7 @@
- public class SharedCounselingLinkActivity extends AppCompatActivity {
-     private static final String TAG = "SharedCounselingLink";
+ /** Imports a ChatGPT shared conversation snapshot and converts it into Mind PT programs. */
+ public class SharedCounselingLinkActivity extends Activity {
+     private static final String COLLECTOR_VERSION = "v3";
 -    private static final int CROWN_POLICY_VERSION = 10;
 +    private static final int CROWN_POLICY_VERSION = 11;
-     private static final String CROWN_POLICY_PREF_PREFIX = "crown_policy_version_";
-@@ -698,10 +698,28 @@
-                 CounselingProgramAnalyzer.CrownRerankResult semantic =
+     private static final String CROWN_POLICY_PREF_PREFIX = "crown_policy_version_counseling_";
+     private EditText linkInput;
+     private TextView statusText, verificationText, previewText, programsText, importButton;
+@@ -699,11 +699,26 @@
                          CounselingProgramAnalyzer.rerankExistingPrograms(apiKey, model, crownTranscript, crownContext);
                  int semanticChanged = store.applyProgramPrioritiesAndSemanticMerges(
                          counselingId, semantic.priorities, semantic.mergeInto);
@@ -54,14 +56,16 @@
                  final String warning = prepWarning;
                  store.bindAllSharedThreadsCounseling(counselingId);
                  prefs.edit().putInt(CROWN_POLICY_PREF_PREFIX + counselingId, CROWN_POLICY_VERSION).apply();
---- v10183_work/app/build.gradle	2026-08-15 09:41:34.945070456 +0000
-+++ v10184_work/app/build.gradle	2026-08-15 10:04:45.717500001 +0000
+--- v10183_work/app/build.gradle	2026-08-15 09:41:34.946158494 +0000
++++ v10184_work/app/build.gradle	2026-08-15 10:04:45.716608920 +0000
 @@ -10,8 +10,8 @@
-         applicationId "com.maeummon.app"
+         applicationId "com.maeummon.app.pastel5.v5400"
          minSdk 26
-         targetSdk 35
+         targetSdk 34
 -        versionCode 101803
 -        versionName "10.18.3"
 +        versionCode 101804
 +        versionName "10.18.4"
      }
+ 
+     buildTypes {
