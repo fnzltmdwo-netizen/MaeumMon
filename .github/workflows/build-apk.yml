@@ -48,17 +48,19 @@ jobs:
           echo "dir=$PROJECT_DIR" >> "$GITHUB_OUTPUT"
           echo "Project root: $PROJECT_DIR"
 
-      - name: Apply latest version patch
+      - name: Apply version patches in order
         shell: bash
         run: |
           set -e
-          PATCH_FILE=$(find patches -maxdepth 1 -type f -name 'v*.patch' | sort -V | tail -n 1 || true)
-          if [ -n "$PATCH_FILE" ]; then
-            echo "Applying $PATCH_FILE"
-            cd "${{ steps.project.outputs.dir }}"
-            patch -p1 < "$GITHUB_WORKSPACE/$PATCH_FILE"
+          cd "${{ steps.project.outputs.dir }}"
+          mapfile -t PATCHES < <(find "$GITHUB_WORKSPACE/patches" -maxdepth 1 -type f -name 'v*.patch' | sort -V)
+          if [ ${#PATCHES[@]} -eq 0 ]; then
+            echo "No patches found; building ZIP as-is"
           else
-            echo "No patch found; building ZIP as-is"
+            for PATCH_FILE in "${PATCHES[@]}"; do
+              echo "Applying $PATCH_FILE"
+              patch -p1 < "$PATCH_FILE"
+            done
           fi
 
       - name: Set up JDK 17
@@ -93,13 +95,13 @@ jobs:
             exit 1
           fi
           mkdir -p out
-          cp "$APK_FILE" out/MaeumMon-v10.18.3.apk
-          ls -lh out/MaeumMon-v10.18.3.apk
+          cp "$APK_FILE" out/MaeumMon-v10.18.4.apk
+          ls -lh out/MaeumMon-v10.18.4.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: MaeumMon-v10.18.3-apk
-          path: out/MaeumMon-v10.18.3.apk
+          name: MaeumMon-v10.18.4-apk
+          path: out/MaeumMon-v10.18.4.apk
           if-no-files-found: error
           retention-days: 30
