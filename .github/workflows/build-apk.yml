@@ -76,12 +76,40 @@ jobs:
       - name: Apply v10.18.18 move Typecast settings
         run: python3 scripts/apply_v10_18_18_move_typecast_settings.py
 
+      - name: Set v10.18.19 version only
+        run: |
+          sed -i -E 's/versionCode[[:space:]]+[0-9]+/versionCode 101819/' extracted/app/build.gradle
+          sed -i -E 's/versionName[[:space:]]+"[^"]+"/versionName "10.18.19"/' extracted/app/build.gradle
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
           cache: gradle
+
+      - name: Restore persistent app signing key
+        uses: actions/cache@v4
+        with:
+          path: ~/.android/debug.keystore
+          key: maeummon-persistent-debug-signing-v1
+
+      - name: Ensure persistent app signing key
+        run: |
+          mkdir -p ~/.android
+          if [ ! -f ~/.android/debug.keystore ]; then
+            keytool -genkeypair -v \
+              -keystore ~/.android/debug.keystore \
+              -storepass android \
+              -alias androiddebugkey \
+              -keypass android \
+              -keyalg RSA \
+              -keysize 2048 \
+              -validity 10000 \
+              -dname "CN=Android Debug,O=Android,C=US"
+          fi
+          keytool -list -keystore ~/.android/debug.keystore -storepass android -alias androiddebugkey
+
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
       - name: Accept Android SDK licenses
@@ -97,10 +125,10 @@ jobs:
           set -e
           APK_FILE=$(find "${{ steps.project.outputs.dir }}" -path "*/build/outputs/apk/debug/*.apk" -type f | head -n 1)
           mkdir -p out
-          cp "$APK_FILE" out/MaeumMon-v10.18.18.apk
+          cp "$APK_FILE" out/MaeumMon-v10.18.19.apk
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: MaeumMon-v10.18.18-apk
-          path: out/MaeumMon-v10.18.18.apk
+          name: MaeumMon-v10.18.19-apk
+          path: out/MaeumMon-v10.18.19.apk
           if-no-files-found: error
