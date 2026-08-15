@@ -81,6 +81,12 @@ jobs:
         run: python3 scripts/apply_v10_18_20_home_friend_settings.py
       - name: Diagnose backup restore
         run: python3 scripts/diagnose_backup_restore.py
+      - name: Upload backup restore diagnostic
+        uses: actions/upload-artifact@v4
+        with:
+          name: backup-restore-diagnostic
+          path: backup_diag_files
+          if-no-files-found: error
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
