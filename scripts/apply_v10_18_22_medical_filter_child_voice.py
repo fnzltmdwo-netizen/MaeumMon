@@ -7,7 +7,6 @@ analyzer = app / 'CounselingProgramAnalyzer.java'
 prefs = app / 'MascotWidgetPrefs.java'
 gradle = root / 'app/build.gradle'
 
-# 1) Strengthen the medical-management exclusion across every analyzer prompt.
 text = analyzer.read_text(encoding='utf-8')
 medical_rule = (
     '최우선 하드 규칙: 마음 PT는 반복 연습으로 바뀔 수 있는 심리·인지·정서·대인관계·행동 능력만 허용한다. '
@@ -20,18 +19,15 @@ marker = '반드시 JSON 하나만 출력한다.'
 if marker in text and medical_rule not in text:
     text = text.replace(marker, medical_rule + marker)
 
-# Also make the crown/reanalysis prompt explicitly exclude already-stored medical PTs.
 needle = '병원 방문, 의료진 보고, 약 이름·용량·복약·부작용 기록, 진료 피드백 횟수처럼 외부 의료관리 행동 자체가 핵심인 PT는 마음훈련이 아니므로 exclude=true로 표시한다.'
 replacement = ('병원 방문, 의료진 보고, 약 이름·용량·복약·부작용 기록, 진료 피드백 횟수처럼 외부 의료관리 행동 자체가 핵심인 PT는 마음훈련이 아니므로 exclude=true로 표시한다. '
                '이미 저장된 PT라도 제목·reason·exercise·success criterion·stage의 핵심이 약물 감시/복약/부작용/병원/의료진 보고라면 반드시 exclude=true로 제거한다.')
 if needle in text:
     text = text.replace(needle, replacement)
 
-# Bump policy version so same counseling link is eligible for re-analysis.
 text = re.sub(r'CROWN_POLICY_VERSION\s*=\s*\d+', 'CROWN_POLICY_VERSION = 18', text)
 analyzer.write_text(text, encoding='utf-8')
 
-# 2) Rewrite mascot tone as a real child voice while preserving numbers/conditions.
 p = prefs.read_text(encoding='utf-8')
 start = p.find('    public static String youngify(String raw) {')
 end = p.find('    public static String widgetLine(Context c) {', start)
@@ -43,8 +39,6 @@ method = r'''    public static String youngify(String raw) {
         String s = raw.replace('\n', ' ').replace('\r', ' ').replaceAll("\\s+", " ").trim();
         if (s.isEmpty()) return s;
 
-        // A medical-management PT should never be generated now. For an older saved PT that still
-        // contains it until re-analysis, do not make the child mascot recite clinical instructions.
         String low = s.toLowerCase(java.util.Locale.KOREA);
         String[] medical = {"의료진", "담당 의료", "병원", "진료", "처방", "복약", "약물", "부작용", "용량", "의사에게", "의료적"};
         for (String k : medical) {
@@ -53,7 +47,6 @@ method = r'''    public static String youngify(String raw) {
             }
         }
 
-        // Keep concrete numbers / conditions, but translate adult or clinical words into a child's everyday Korean.
         s = s.replace("인지적 분리", "따로 보기")
              .replace("인지 분리", "따로 보기")
              .replace("인지적 재평가", "다시 생각해보기")
@@ -108,10 +101,8 @@ method = r'''    public static String youngify(String raw) {
              .replace("입니다.", "이야.")
              .replace("됩니다.", "돼.");
 
-        // Child rhythm: short, direct, together. Do not alter digits or quoted choices.
         if (!s.startsWith("승재야") && !s.startsWith("우리")) s = "승재야, 우리 " + s;
-        s = s.replace(";", ". ").replace(" 또한 ", ". 그리고 ");
-        s = s.replaceAll("\\s*\.\\s*", ". ").trim();
+        s = s.replace(";", ". ").replace(" 또한 ", ". 그리고 ").trim();
         if (!s.endsWith(".") && !s.endsWith("!") && !s.endsWith("?")) s += ".";
         return s;
     }
@@ -120,7 +111,6 @@ method = r'''    public static String youngify(String raw) {
 p = p[:start] + method + p[end:]
 prefs.write_text(p, encoding='utf-8')
 
-# 3) Version bump only; PT architecture itself is untouched.
 g = gradle.read_text(encoding='utf-8')
 g = re.sub(r'versionCode\s+\d+', 'versionCode 101822', g)
 g = re.sub(r'versionName\s+"[^"]+"', 'versionName "10.18.22"', g)
