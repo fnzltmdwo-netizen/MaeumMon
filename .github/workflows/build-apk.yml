@@ -84,6 +84,10 @@ jobs:
         shell: bash
         run: python3 scripts/apply_v10_18_10.py
 
+      - name: Apply v10.18.11 cute pastel UI refresh
+        shell: bash
+        run: python3 scripts/apply_v10_18_11_cute_design.py
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -116,13 +120,13 @@ jobs:
             exit 1
           fi
           mkdir -p out
-          cp "$APK_FILE" out/MaeumMon-v10.18.10.apk
-          ls -lh out/MaeumMon-v10.18.10.apk
+          cp "$APK_FILE" out/MaeumMon-v10.18.11.apk
+          ls -lh out/MaeumMon-v10.18.11.apk
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: MaeumMon-v10.18.10-apk
-          path: out/MaeumMon-v10.18.10.apk
+          name: MaeumMon-v10.18.11-apk
+          path: out/MaeumMon-v10.18.11.apk
           if-no-files-found: error
           retention-days: 30
