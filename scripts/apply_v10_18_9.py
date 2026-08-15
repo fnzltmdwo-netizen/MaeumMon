@@ -8,9 +8,6 @@ gradle = root / 'app/build.gradle'
 
 text = analyzer.read_text(encoding='utf-8')
 
-# Replace the common "callResponses -> parse JSONObject" path with a recovery-aware parser.
-# It preserves each method's existing schema/task, but if the first JSON is cut off it asks for
-# a compact re-run of the SAME task and retries parsing up to two more times.
 pat = re.compile(
     r'String text = callResponses\(apiKey,\s*([^,]+),\s*system,\s*user,\s*(\d+)\);\s*'
     r'JSONObject root = new JSONObject\(extractJsonObject\(text\)\);'
@@ -28,12 +25,9 @@ text, replaced = pat.subn(repl, text)
 if replaced == 0:
     raise SystemExit('v10.18.9: no JSON parse call sites matched')
 
-# Add one shared recovery helper. Keep it schema-agnostic by reusing the exact original system/user prompt.
 helper = r'''
 
-    // v10.18.9: GPT can occasionally return a syntactically truncated JSON object/array even
-    // when the HTTP request itself succeeds. Re-run the SAME task in a compact form instead of
-    // throwing away the already-saved counseling transcript or existing PT state.
+    // v10.18.9: recover from syntactically truncated JSON without discarding saved counseling data.
     private static JSONObject parseJsonWithRecovery(String apiKey, String model, String originalSystem,
                                                      String originalUser, String firstText,
                                                      int originalMaxTokens) throws Exception {
@@ -46,8 +40,6 @@ helper = r'''
                 last = parseError;
                 if (attempt >= 2) break;
 
-                // The original prompt already contains the exact JSON schema. Preserve it, but
-                // explicitly force a much more compact answer so arrays/objects close cleanly.
                 String compactSystem = originalSystem
                         + " IMPORTANT RECOVERY MODE: the previous JSON response was cut off or invalid. "
                         + "Redo the SAME task from scratch and output exactly one COMPLETE valid JSON object. "
@@ -75,24 +67,21 @@ helper = r'''
                 if (networkLast != null) throw networkLast;
             }
         }
-        throw last == null ? new JSONException("JSON recovery failed") : last;
+        throw last == null ? new Exception("JSON recovery failed") : last;
     }
 '''
 
-# Insert helper before the class' final closing brace.
 pos = text.rfind('\n}')
 if pos < 0:
     raise SystemExit('v10.18.9: analyzer class closing brace not found')
 text = text[:pos] + helper + text[pos:]
 analyzer.write_text(text, encoding='utf-8')
 
-# Force a policy refresh even when the same share link has 0 new turns.
 s = shared.read_text(encoding='utf-8')
 s, n = re.subn(r'private static final int CROWN_POLICY_VERSION = \d+;',
                 'private static final int CROWN_POLICY_VERSION = 16;', s, count=1)
 if n != 1:
     raise SystemExit('v10.18.9: policy version anchor missing')
-# Friendlier message: never dump a giant broken JSON response into the normal UI.
 s = re.sub(r'"⚠️ 분석 중 문제가 생겼어: "\s*\+\s*[^;]+;',
            '"⚠️ 분석 응답이 중간에 끊겼어. 저장된 원문으로 자동 복구를 시도할게.";',
            s)
