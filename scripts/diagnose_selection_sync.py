@@ -11,7 +11,8 @@ needles = [
     'CentralMindPtState', 'selected', 'selectedProgram', 'selected_pt',
     'current PT', 'CURRENT_PT', 'mascotLine', 'widgetLine',
     'MindTrainingStore', 'setSelected', 'selectedMuscle', 'selectedTitle',
-    '오늘의 마음 PT', 'crown', '대표', 'MascotWidgetPrefs', 'youngify'
+    '오늘의 마음 PT', 'crown', '대표', 'MascotWidgetPrefs', 'youngify',
+    'LauncherSurfaceAccessibilityService'
 ]
 
 chunks = []
@@ -46,11 +47,12 @@ for p in root.rglob('*'):
 
 names = [
     'MascotWidgetPrefs.java', 'CentralMindPtState.java', 'MindTrainingStore.java',
-    'OverlayService.java', 'MaeumMonClockWidget.java', 'CounselingProgramAnalyzer.java',
+    'OverlayService.java', 'LauncherSurfaceAccessibilityService.java',
+    'MaeumMonClockWidget.java', 'CounselingProgramAnalyzer.java',
     'TherapySurfaceContext.java', 'TherapySurfacePolicyV501.java',
     'widget_maeummon_clock.xml', 'widget_maeummon_large.xml',
     'widget_maeummon_medium.xml', 'widget_maeummon_small.xml',
-    'widget_maeummon_narrow.xml'
+    'widget_maeummon_narrow.xml', 'maeummon_clock_widget_info.xml'
 ]
 for name in names:
     for p in root.rglob(name):
