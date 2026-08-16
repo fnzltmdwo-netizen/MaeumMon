@@ -115,6 +115,22 @@ jobs:
         run: python3 scripts/apply_v10_18_37_emoji_design_system.py
       - name: Apply v10.18.38 Strawberry Moon universe redesign
         run: python3 scripts/apply_v10_18_38_strawberry_moon_universe.py
+      - name: Apply v10.18.39 second-sister moon mage mascot
+        run: python3 scripts/apply_v10_18_39_second_sister_mascot.py
+
+      - name: Package patched Android project ZIP
+        run: |
+          set -e
+          cd "${{ steps.project.outputs.dir }}"
+          zip -qr "$GITHUB_WORKSPACE/MaeumMon-v10.18.39-project.zip" . \
+            -x '.gradle/*' '*/build/*' 'build/*' '*.apk'
+
+      - name: Upload patched project ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: MaeumMon-v10.18.39-project
+          path: MaeumMon-v10.18.39-project.zip
+          if-no-files-found: error
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -160,10 +176,10 @@ jobs:
           set -e
           APK_FILE=$(find "${{ steps.project.outputs.dir }}" -path "*/build/outputs/apk/debug/*.apk" -type f | head -n 1)
           mkdir -p out
-          cp "$APK_FILE" out/MaeumMon-v10.18.38.apk
+          cp "$APK_FILE" out/MaeumMon-v10.18.39.apk
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: MaeumMon-v10.18.38-apk
-          path: out/MaeumMon-v10.18.38.apk
+          name: MaeumMon-v10.18.39-apk
+          path: out/MaeumMon-v10.18.39.apk
           if-no-files-found: error
