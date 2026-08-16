@@ -94,7 +94,7 @@ jobs:
       - name: Apply v10.18.27 widget full text and home mascot fix
         run: python3 scripts/apply_v10_18_27_widget_fulltext_home_mascot_fix.py
       - name: Apply v10.18.28 structural widget and mascot fix
-        run: python3 scripts/apply_v10_18_28_structural_widget_mascot_fix.py
+        run: python3 scripts/apply_v10_18_28b_structural_widget_mascot_fix.py
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
