@@ -95,6 +95,8 @@ jobs:
         run: python3 scripts/apply_v10_18_27_widget_fulltext_home_mascot_fix.py
       - name: Apply v10.18.28 structural widget and mascot fix
         run: python3 scripts/apply_v10_18_28b_structural_widget_mascot_fix.py
+      - name: Apply v10.18.29 corpus-distilled warm clear Mind PT
+        run: python3 scripts/apply_v10_18_29_oh_style_pt.py
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -140,10 +142,10 @@ jobs:
           set -e
           APK_FILE=$(find "${{ steps.project.outputs.dir }}" -path "*/build/outputs/apk/debug/*.apk" -type f | head -n 1)
           mkdir -p out
-          cp "$APK_FILE" out/MaeumMon-v10.18.28.apk
+          cp "$APK_FILE" out/MaeumMon-v10.18.29.apk
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: MaeumMon-v10.18.28-apk
-          path: out/MaeumMon-v10.18.28.apk
+          name: MaeumMon-v10.18.29-apk
+          path: out/MaeumMon-v10.18.29.apk
           if-no-files-found: error
