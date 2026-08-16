@@ -96,6 +96,12 @@ jobs:
           find extracted/app/src/main/java/com/maeummon/app -maxdepth 1 -type f | grep -Ei 'Program|Training|Pt|Growth|MainActivity' || true
       - name: Diagnose selected PT sync
         run: python3 scripts/diagnose_selection_sync.py
+      - name: Upload selected PT diagnostic
+        uses: actions/upload-artifact@v4
+        with:
+          name: selection-sync-diag
+          path: out/selection_sync_diag.txt
+          if-no-files-found: error
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
