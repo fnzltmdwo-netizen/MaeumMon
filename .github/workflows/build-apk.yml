@@ -85,6 +85,15 @@ jobs:
         run: python3 scripts/apply_v10_18_22_medical_filter_child_voice.py
       - name: Apply v10.18.23 preserve nonmedical PTs
         run: python3 scripts/apply_v10_18_23_preserve_nonmedical_pts.py
+      - name: Diagnose v10.18.24 PT display and selection paths
+        shell: bash
+        run: |
+          echo '=== files containing selected PT / today PT / widgetLine ==='
+          grep -RInE 'selected.?pt|selectedProgram|오늘의 마음 PT|widgetLine\(|youngify\(|current.*PT|SELECTED' extracted/app/src/main/java/com/maeummon/app 2>/dev/null | head -n 300 || true
+          echo '=== MascotWidgetPrefs ==='
+          sed -n '1,280p' extracted/app/src/main/java/com/maeummon/app/MascotWidgetPrefs.java || true
+          echo '=== PT related files ==='
+          find extracted/app/src/main/java/com/maeummon/app -maxdepth 1 -type f | grep -Ei 'Program|Training|Pt|Growth|MainActivity' || true
       - name: Diagnose selected PT sync
         run: python3 scripts/diagnose_selection_sync.py
 
