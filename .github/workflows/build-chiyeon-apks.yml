@@ -1,0 +1,101 @@
+name: Build Chiyeon APKS
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "ChiyeonComfortWidget*.zip"
+      - ".github/workflows/build-chiyeon-apks.yml"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Find latest Chiyeon project ZIP
+        id: findzip
+        shell: bash
+        run: |
+          set -e
+          ZIP_FILE=$(ls -1t ChiyeonComfortWidget*.zip | head -n 1)
+          echo "zip=$ZIP_FILE" >> "$GITHUB_OUTPUT"
+          echo "Using ZIP: $ZIP_FILE"
+
+      - name: Extract project
+        run: |
+          set -e
+          rm -rf chiyeon_project
+          mkdir -p chiyeon_project
+          unzip -q "${{ steps.findzip.outputs.zip }}" -d chiyeon_project
+
+      - name: Locate Gradle project root
+        id: project
+        shell: bash
+        run: |
+          set -e
+          GRADLEW=$(find chiyeon_project -type f -name gradlew | head -n 1)
+          test -n "$GRADLEW"
+          PROJECT_DIR=$(dirname "$GRADLEW")
+          echo "dir=$PROJECT_DIR" >> "$GITHUB_OUTPUT"
+          echo "Project: $PROJECT_DIR"
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Accept Android SDK licenses
+        run: yes | sdkmanager --licenses >/dev/null || true
+
+      - name: Make Gradle executable
+        working-directory: ${{ steps.project.outputs.dir }}
+        run: chmod +x ./gradlew
+
+      - name: Build debug APK and APKS
+        working-directory: ${{ steps.project.outputs.dir }}
+        run: ./gradlew assembleDebug --no-daemon --stacktrace
+
+      - name: Collect install files
+        shell: bash
+        run: |
+          set -e
+          mkdir -p out
+          APK_FILE=$(find "${{ steps.project.outputs.dir }}" -path '*/build/outputs/apk/debug/*.apk' -type f | head -n 1)
+          test -n "$APK_FILE"
+          cp "$APK_FILE" out/ChiyeonComfortWidget-v1.4.1-debug.apk
+
+          APKS_FILE=$(find "${{ steps.project.outputs.dir }}" -path '*/build/outputs/apks/*.apks' -type f | head -n 1 || true)
+          if [ -n "$APKS_FILE" ]; then
+            cp "$APKS_FILE" out/ChiyeonComfortWidget-v1.4.1-debug.apks
+          else
+            mkdir -p sai_tmp
+            cp "$APK_FILE" sai_tmp/base.apk
+            printf '%s\n' '{"export_timestamp":0,"label":"치연 위젯","package":"com.mandarin.chiyeonwidget","version_code":18,"version_name":"1.4.1"}' > sai_tmp/meta.sai_v1.json
+            (cd sai_tmp && zip -q "$GITHUB_WORKSPACE/out/ChiyeonComfortWidget-v1.4.1-debug.apks" base.apk meta.sai_v1.json)
+          fi
+
+          test -s out/ChiyeonComfortWidget-v1.4.1-debug.apks
+          unzip -t out/ChiyeonComfortWidget-v1.4.1-debug.apks
+
+      - name: Upload APKS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ChiyeonComfortWidget-v1.4.1-apks
+          path: out/ChiyeonComfortWidget-v1.4.1-debug.apks
+          if-no-files-found: error
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ChiyeonComfortWidget-v1.4.1-apk
+          path: out/ChiyeonComfortWidget-v1.4.1-debug.apk
+          if-no-files-found: error
