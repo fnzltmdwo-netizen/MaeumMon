@@ -1,0 +1,65 @@
+name: Build Chiyeon Debt Overlay V115
+
+on:
+  push:
+    branches: [ "chiyeon-debt-v115-build" ]
+    paths:
+      - "ChiyeonDebtOverlayV115Source.zip"
+      - ".github/workflows/build-chiyeon-debt-v115.yml"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Extract V115 source
+        run: |
+          mkdir -p chiyeon_v115
+          unzip -q ChiyeonDebtOverlayV115Source.zip -d chiyeon_v115
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Gradle 8.9
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.9"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android 35 build tools
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+
+      - name: Build unsigned release APK
+        working-directory: chiyeon_v115
+        run: gradle :debtapp:assembleRelease --no-daemon --stacktrace
+
+      - name: Collect unsigned APK and signing tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p out
+          APK_FILE=$(find chiyeon_v115/debtapp/build/outputs/apk/release -name '*-unsigned.apk' -type f | head -n 1)
+          test -s "$APK_FILE"
+          BUILD_TOOLS=$(find "$ANDROID_HOME/build-tools" -mindepth 1 -maxdepth 1 -type d | sort -V | tail -n 1)
+          test -x "$BUILD_TOOLS/zipalign"
+          test -s "$BUILD_TOOLS/lib/apksigner.jar"
+          cp "$APK_FILE" out/chiyeon-debt-v115-unsigned.apk
+          cp "$BUILD_TOOLS/zipalign" out/zipalign
+          cp "$BUILD_TOOLS/lib/apksigner.jar" out/apksigner.jar
+          sha256sum out/* > out/SHA256SUMS.txt
+
+      - name: Upload unsigned build bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: CHIYEON_DEBT_OVERLAY_V115_UNSIGNED
+          path: out/
+          if-no-files-found: error
+          retention-days: 7
