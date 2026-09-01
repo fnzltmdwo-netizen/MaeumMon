@@ -1,0 +1,68 @@
+name: Build SpeechClarityLab APK
+
+on:
+  push:
+    branches: [ "speechlab-v0.4-build" ]
+    paths:
+      - "SpeechClarityLab_Android_v0.4_Source.zip"
+      - ".github/workflows/build-speechlab-v04.yml"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Accept licenses and install SDK 35
+        shell: bash
+        run: |
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager "platforms;android-35" "build-tools;35.0.0" "platform-tools"
+
+      - name: Set up Gradle 8.9
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Extract project
+        shell: bash
+        run: |
+          rm -rf speechlab-src
+          mkdir speechlab-src
+          unzip -q SpeechClarityLab_Android_v0.4_Source.zip -d speechlab-src
+          PROJECT_DIR=$(find speechlab-src -type f -name settings.gradle -printf '%h\n' | head -n 1)
+          echo "PROJECT_DIR=$PROJECT_DIR" >> "$GITHUB_ENV"
+          echo "Project: $PROJECT_DIR"
+
+      - name: Build debug APK
+        shell: bash
+        run: |
+          cd "$PROJECT_DIR"
+          gradle --no-daemon --stacktrace assembleDebug
+
+      - name: Collect APK
+        shell: bash
+        run: |
+          APK_FILE=$(find "$PROJECT_DIR" -type f -path "*/build/outputs/apk/debug/*.apk" | head -n 1)
+          test -n "$APK_FILE"
+          mkdir -p out
+          cp "$APK_FILE" out/SpeechClarityLab-v0.4-debug.apk
+          ls -lh out/SpeechClarityLab-v0.4-debug.apk
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: SpeechClarityLab-v0.4-apk
+          path: out/SpeechClarityLab-v0.4-debug.apk
+          if-no-files-found: error
