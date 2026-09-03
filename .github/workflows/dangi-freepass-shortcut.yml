@@ -32,7 +32,13 @@ jobs:
           gradle-version: '8.9'
 
       - name: Lint and build signed debug APK
-        run: gradle -p dangi-freepass-shortcut :app:lintDebug :app:assembleDebug --no-daemon --stacktrace
+        run: gradle -p dangi-freepass-shortcut clean :app:lintDebug :app:assembleDebug --no-daemon --no-build-cache --stacktrace
+
+      - name: Verify exact-label matcher is packaged
+        run: |
+          unzip -p dangi-freepass-shortcut/app/build/outputs/apk/debug/app-debug.apk classes.dex classes2.dex \
+            | strings \
+            | grep -F 'getContentDescription'
 
       - name: Verify Android APK signature
         run: |
