@@ -90,6 +90,15 @@ public final class FreePassAccessibilityService extends AccessibilityService {
                 continue;
             }
             for (AccessibilityNodeInfo match : matches) {
+                CharSequence nodeText = match.getText();
+                CharSequence contentDescription = match.getContentDescription();
+                boolean exactText = nodeText != null && label.contentEquals(nodeText);
+                boolean exactDescription = contentDescription != null
+                        && label.contentEquals(contentDescription);
+                if (!exactText && !exactDescription) {
+                    continue;
+                }
+
                 AccessibilityNodeInfo candidate = match;
                 for (int depth = 0; candidate != null && depth < 7; depth++) {
                     if (candidate.isVisibleToUser()
